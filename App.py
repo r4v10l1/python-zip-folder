@@ -1,37 +1,55 @@
-import os
-import zipfile
-import datetime
-import argparse
-import config
-from mega import Mega
-import psutil
-import platform
+try:
+	import os, zipfile, datetime, argparse, config, psutil, platform
+	from colorama import Fore, Style
+	from mega import Mega
+except Exception:
+	print("[!] A library error ocurred. Make sure you ran: python3 -m pip install -r requirements.txt")
 
+if platform.system() == 'Linux':
+    runningFile = 'java'
+    def input_inf(text):
+    	input("%s%s%s[%s%si%s]%s %s%s%s" % (Style.RESET_ALL, Fore.BLUE, Style.BRIGHT, Style.RESET_ALL, Fore.BLUE, Style.BRIGHT, Style.RESET_ALL, Fore.BLUE, text, Style.RESET_ALL))
+    def input_error(text):
+    	input("%s%s%s[%s%s!%s]%s %s%s%s" % (Style.RESET_ALL, Fore.RED, Style.BRIGHT, Style.RESET_ALL, Fore.RED, Style.BRIGHT, Style.RESET_ALL, Fore.RED, text, Style.RESET_ALL))
+    def success_text(text):
+    	print("%s%s%s[%s%s+%s]%s %s%s%s" % (Style.RESET_ALL, Fore.GREEN, Style.BRIGHT, Style.RESET_ALL, Fore.GREEN, Style.BRIGHT, Style.RESET_ALL, Fore.GREEN, text, Style.RESET_ALL))
+    def informative_text(text):
+    	print("%s%s%s[%s%si%s]%s %s%s%s" % (Style.RESET_ALL, Fore.BLUE, Style.BRIGHT, Style.RESET_ALL, Fore.BLUE, Style.BRIGHT, Style.RESET_ALL, Fore.BLUE, text, Style.RESET_ALL))
+    def error_text(text):
+    	print("%s%s%s[%s%s!%s]%s %s%s%s" % (Style.RESET_ALL, Fore.RED, Style.BRIGHT, Style.RESET_ALL, Fore.RED, Style.BRIGHT, Style.RESET_ALL, Fore.RED, text, Style.RESET_ALL))
+    def warning_text(text):
+    	print("%s%s%s[%s%s!%s]%s %s%s%s" % (Style.RESET_ALL, Fore.YELLOW, Style.BRIGHT, Style.RESET_ALL, Fore.YELLOW, Style.BRIGHT, Style.RESET_ALL, Fore.YELLOW, text, Style.RESET_ALL))
+elif platform.system() == 'Darwin':
+    runningFile = 'javaw.app'
+elif platform.system() == 'Windows':
+    runningFile = 'javaw'
+    def input_inf(text):
+    	input("[i] %s" % text)
+    def input_error(text):
+    	input("[!] %s" % text)
+    def success_text(text):
+    	print("[+] %s" % text)
+    def informative_text(text):
+    	print("[i] %s" % text)
+    def error_text(text):
+    	print("[!] %s" % text)
+    def warning_text(text):
+    	print("[!] %s" % text)
 
-# Nothin below here really needs to be edited
-class bcolors:  # Set the colors we use
-    HEADER = '\033[95m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    FAIL = '\033[91m'
-
+def help_reminder():
+    	informative_text("Run python App.py --help for more info.")
 
 parser = argparse.ArgumentParser('python App.py')  # The --help section
 parser.add_argument('-u', '--user', type=str,
-                    help='Your Mega.NZ username. Usage: '
-                    + bcolors.OKGREEN + ' python App.py -u youremail@megaaccount.nz'
-                    + bcolors.ENDC + ' (overrules user set in config.py)')
+                    help='Your Mega.nz username (overrules user set in config.py).\nUsage: python App.py -u youremail@megaaccount.nz')
 parser.add_argument('-p', '--password', type=str,
-                    help='Mega.NZ password (overrules password set in config.py)')
+                    help='Mega.nz password (overrules password set in config.py)')
 parser.add_argument('-w', '--world', type=str,
                     help='Name of the folder/world\
                     to back up (overrules folderName set in config.py')
 parser.add_argument('-dl', '--download', type=int,
                     help='Download and unpack\
-                    backups. Usage: ' + bcolors.OKGREEN + ' python App.py -dl 1 ' + bcolors.ENDC + 'where 1 indicates how many\
+                    backups. Usage: python App.py -dl 1 where 1 indicates how many\
                     days/backups you want to go.')
 args = parser.parse_args()
 
@@ -42,13 +60,6 @@ dl = args.download
 
 mega = Mega()  # Initiate Mega lib
 
-if platform.system() == 'Linux':
-    runningFile = 'java'
-elif platform.system() == 'Darwin':
-    runningFile = 'javaw.app'
-elif platform.system() == 'Windows':
-    runningFile = 'javaw'
-
 # Check if user and pass is set or passed
 if passed_user is not None:
     if passed_password is None:
@@ -58,9 +69,8 @@ if passed_user is not None:
 elif config.megaCreds['user'] and config.megaCreds['password'] != '':
     m = mega.login(config.megaCreds['user'], config.megaCreds['password'])
 else:
-    print(bcolors.FAIL + 'No account settings found for Mega.nz' + bcolors.ENDC)
-    print('Run ' + bcolors.OKGREEN + 'python App.py --help' +
-          bcolors.ENDC + ' for more info')
+    error_text("No account settings found for Mega.nz")
+    help_reminder()
     exit()
 
 
@@ -71,9 +81,8 @@ else:
 
 
 if world == '':
-    print(bcolors.FAIL + 'No world folder set.' + bcolors.ENDC)
-    print('Run ' + bcolors.OKGREEN + 'python App.py --help' +
-          bcolors.ENDC + ' for more info')
+    error_text("No world folder set.")
+    help_reminder()
     exit()
 
 
@@ -94,20 +103,18 @@ def download_backup():
             linklist.append(link)
 
     location = os.getcwd()
-    print(bcolors.WARNING + '[!]' + bcolors.ENDC + ' Mining duped world from '
-          + bcolors.WARNING + str(dl) + bcolors.ENDC + ' days ago.. Please wait')
+    informative_text(f"Mining duped world from {str(dl)} days ago.. Please wait.")
     filenamelist.sort(reverse=True)
     linklist.sort(reverse=True)
     dllink = (str(linklist[days_back]))
     dlfile = str(filenamelist[days_back])
     m.download_url(dllink, location)
-    print(bcolors.OKGREEN + '[+]' + bcolors.ENDC + ' Mining complete')
-    print(bcolors.WARNING + '[!]' + bcolors.ENDC +
-          ' Crafting world from dupe - this will just take a game-tick or two, almost there')
+    success_text("Mining complete.")
+    informative_text("Crafting world from dupe - this will just take a game-tick or two, almost there...")
     with zipfile.ZipFile(dlfile, 'r') as zipObj:
         # Extract all the contents of zip file in current directory
         zipObj.extractall()
-    print(bcolors.OKGREEN + 'Success! Grab your pickaxe and go mine!' + bcolors.ENDC)
+    success_text("Success! Grab your pickaxe and go mine!")
 
 
 if args.download is not None:
@@ -143,41 +150,35 @@ def main():
     ziparchive = world + now + '.zip'
     filePaths = retrieve_file_paths(world)
 
-    print(bcolors.HEADER + '[+]' + bcolors.ENDC + ' Duping ' + world + ':')
+    informative_text(f"Duping {world}. Items being duped:")
     for fileName in filePaths:
         print(fileName)
 
     print('')
-    print(bcolors.WARNING +
-          '[!] Crafting a shulker box with your world inside. This may have the Slowness effect depending on your world size, computers specs and such.' + bcolors.ENDC)
+    informative_text("Crafting a shulker box with your world inside. This may have the Slowness effect depending on your world size, computers specs and such.")
     zip_file = zipfile.ZipFile(ziparchive, 'w')
     with zip_file:
         for file in filePaths:
             zip_file.write(file)
 
-    print(bcolors.OKGREEN + '[+] ' + bcolors.ENDC +
-          ziparchive + ' shulker was crafted successfully!')
+    success_text(f"The shulker {ziparchive} was crafted successfully!")
     folder = m.find('mcbackup')
-    print(bcolors.WARNING + '[!]' + bcolors.ENDC +
-          ' Uploading .. Please wait.. ')
+    informative_text("Uploading... Please wait...")
     backup = m.upload(ziparchive, folder)
-    print(bcolors.OKGREEN + world + bcolors.ENDC +
-          ' has been duped like TNT and sent to your ender chest:')
+    success_text(f"{world} has been duped and sent to the following ender chest: ")
     link = m.get_upload_link(backup)
-    print(bcolors.UNDERLINE + bcolors.BOLD + link + bcolors.ENDC)
+    print()
+    print(link)
     quota = m.get_storage_space(giga=True)
     print('')
-    print(bcolors.WARNING + '[!]' + bcolors.ENDC +
-          'Tidying up - throwing local shulker in lava')
+    informative_text("Tidying up - throwing local shulker in lava...")
     os.remove(ziparchive)
-    print('[i] You have now used ' + bcolors.OKGREEN + str(round(quota['used'], 2)) + ' GB' + bcolors.ENDC +
-          ' of your ' + bcolors.OKGREEN + str(quota['total']) + ' GB ' + bcolors.ENDC + 'total in your ender chest inventory.')
-
+    warning_text(f"You have now used {str(round(quota['used'], 2))} GB of your {str(quota['total'])} GB total in your ender chest inventory.")
 
 # Let's do this
 if __name__ == '__main__':
     if checkIfProcessRunning(runningFile):
-        input('Minecraft is running. Please close game, and press any key to continue..')
+        input_error('Minecraft is running. Please close the game, and press any key to continue...')
         exec(open('App.py').read())
     else:
         main()
