@@ -1,1 +1,9 @@
-mega.py psutil
+os
+zipfile
+datetime
+argparse
+config
+psutil
+platform
+colorama
+mega.py
