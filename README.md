@@ -47,8 +47,6 @@ will download John's HawaiiMC backup from yesterday.
 
 Note: If you don't want to use your password in the command because you don't want to store it in the shell history, you can add a blank space ` ` before your command.
 
-` python App.py -u John@johnson.com -p Ep1cHardP4ss -w HawaiiMC -dl 1`
-
 ### Help
 
 `python App.py --help`
