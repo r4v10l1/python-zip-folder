@@ -45,9 +45,7 @@ will download John's HawaiiMC backup from yesterday.
 
 `-dl` is of course optional and expects and integer representing how many backups/days you want to go back.
 
-Note: If you don't want to use your password in the command because you don't want to store it in the shell history, you can add a blank space
-` `
-before your command.
+Note: If you don't want to use your password in the command because you don't want to store it in the shell history, you can add a [blank space](https://www.youtube.com/watch?v=-J2WggXWq70) before your command.
 
 ### Help
 
