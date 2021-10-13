@@ -14,12 +14,11 @@ It should be able to run on every machine that has python installed, but have no
 
 ### Installing
 
-`git clone https://github.com/r4v10l1/python-zip-folder PATH-TO-YOUR-SAVES-FOLDER`
-
-`pip install -r requirements.txt` (Updated the file to add colorama)
-
-`python3 App.py`
-
+```shell
+git clone https://github.com/r4v10l1/python-zip-folder PATH-TO-YOUR-SAVES-FOLDER
+pip install -r requirements.txt  # (Updated the file to add colorama)
+python3 App.py
+```
 ### Configuring
 
 #### Editing the config.py file
